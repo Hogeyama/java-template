@@ -2,7 +2,10 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.5'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id "net.ltgt.errorprone" version "4.1.0"
 }
+
+import net.ltgt.gradle.errorprone.CheckSeverity
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -32,6 +35,11 @@ dependencies {
 	implementation 'org.flywaydb:flyway-database-postgresql'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 	implementation 'org.springframework.session:spring-session-core'
+
+	implementation 'org.jspecify:jspecify:1.0.0'
+	errorprone "com.uber.nullaway:nullaway:0.12.1"
+	errorprone 'com.google.errorprone:error_prone_core:2.35.1'
+	
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
@@ -48,4 +56,12 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+
+tasks.withType(JavaCompile) {
+  options.errorprone {
+    check("NullAway", CheckSeverity.ERROR)
+    option("NullAway:AnnotatedPackages", "com.uber")
+  }
 }
