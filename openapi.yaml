@@ -1,0 +1,128 @@
+HTTP/1.1 200 
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/vnd.oai.openapi
+Content-Length: 3161
+Date: Sat, 16 Nov 2024 13:50:29 GMT
+
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080/api
+  description: Generated server url
+tags:
+- name: Authentication
+  description: 認証関連のAPI
+paths:
+  /api/auth/logout:
+    post:
+      tags:
+      - Authentication
+      summary: ログアウト
+      description: 現在のセッションからログアウトし、JWTトークンを無効化します
+      operationId: logout
+      parameters:
+      - name: jwt
+        in: cookie
+        description: JWT認証トークン
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: ログアウト成功
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/auth/login:
+    post:
+      tags:
+      - Authentication
+      summary: ログイン
+      description: ユーザー名とパスワードでログインし、JWTトークンを取得します
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "400":
+          description: 無効なユーザー名またはパスワード
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: ログイン成功
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/auth/change-password:
+    post:
+      tags:
+      - Authentication
+      summary: パスワード変更
+      description: 現在のパスワードを確認した上で、新しいパスワードに変更します
+      operationId: changePassword
+      parameters:
+      - name: jwt
+        in: cookie
+        description: JWT認証トークン
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+        required: true
+      responses:
+        "400":
+          description: 無効なパスワードまたはユーザーが見つかりません
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: パスワード変更成功
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: ユーザー名
+          example: user1
+        password:
+          type: string
+          description: パスワード
+          example: password123
+      description: ログインリクエスト
+    ChangePasswordRequest:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          description: 現在のパスワード
+          example: oldPassword123
+        newPassword:
+          type: string
+          description: 新しいパスワード
+          example: newPassword123
+      description: パスワード変更リクエスト

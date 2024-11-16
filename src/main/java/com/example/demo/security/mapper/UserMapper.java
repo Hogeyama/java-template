@@ -4,7 +4,6 @@ import com.example.demo.security.entity.User;
 import com.example.demo.security.entity.Role;
 import org.apache.ibatis.annotations.*;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 

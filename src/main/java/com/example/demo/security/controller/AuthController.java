@@ -5,6 +5,13 @@ import com.example.demo.security.entity.User;
 import com.example.demo.security.mapper.RevokedTokenMapper;
 import com.example.demo.security.mapper.UserMapper;
 import com.example.demo.security.service.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +27,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "認証関連のAPI")
 public class AuthController {
 
     private final UserMapper userMapper;
@@ -28,17 +36,29 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
 
     @Data
+    @Schema(description = "ログインリクエスト")
     public static class LoginRequest {
+        @Schema(description = "ユーザー名", example = "user1")
         private String username;
+        @Schema(description = "パスワード", example = "password123")
         private String password;
     }
 
     @Data
+    @Schema(description = "パスワード変更リクエスト")
     public static class ChangePasswordRequest {
+        @Schema(description = "現在のパスワード", example = "oldPassword123")
         private String oldPassword;
+        @Schema(description = "新しいパスワード", example = "newPassword123")
         private String newPassword;
     }
 
+    @Operation(summary = "ログイン", description = "ユーザー名とパスワードでログインし、JWTトークンを取得します")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "ログイン成功"),
+        @ApiResponse(responseCode = "400", description = "無効なユーザー名またはパスワード", 
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequest request,
@@ -62,10 +82,17 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "パスワード変更", description = "現在のパスワードを確認した上で、新しいパスワードに変更します")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "パスワード変更成功"),
+        @ApiResponse(responseCode = "400", description = "無効なパスワードまたはユーザーが見つかりません", 
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
             HttpServletRequest httpRequest,
+            @Parameter(description = "JWT認証トークン", required = true)
             @CookieValue("jwt") String token) {
 
         String username = jwtService.getUsername(token);
@@ -94,9 +121,14 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "ログアウト", description = "現在のセッションからログアウトし、JWTトークンを無効化します")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "ログアウト成功")
+    })
     @PostMapping("/logout")
     public ResponseEntity<?> logout(
             HttpServletResponse response,
+            @Parameter(description = "JWT認証トークン", required = true)
             @CookieValue("jwt") String token) {
 
         // トークンを無効化
