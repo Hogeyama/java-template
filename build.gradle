@@ -36,6 +36,11 @@ dependencies {
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 	implementation 'org.springframework.session:spring-session-core'
 
+	// JWT関連
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
 	implementation 'org.jspecify:jspecify:1.0.0'
 	errorprone "com.uber.nullaway:nullaway:0.12.1"
 	errorprone 'com.google.errorprone:error_prone_core:2.35.1'
@@ -61,7 +66,6 @@ dependencyLocking {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-
 
 tasks.withType(JavaCompile) {
   options.errorprone {
