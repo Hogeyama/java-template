@@ -1,4 +1,7 @@
 HTTP/1.1 200 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
@@ -6,15 +9,15 @@ Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
 Content-Type: application/vnd.oai.openapi
-Content-Length: 3161
-Date: Sat, 16 Nov 2024 13:50:29 GMT
+Content-Length: 3157
+Date: Sun, 17 Nov 2024 16:10:33 GMT
 
 openapi: 3.0.1
 info:
   title: OpenAPI definition
   version: v0
 servers:
-- url: http://localhost:8080/api
+- url: http://localhost:8080
   description: Generated server url
 tags:
 - name: Authentication
