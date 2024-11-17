@@ -38,7 +38,7 @@
     </appender>
 
     <!-- アクセスログ用のロガー -->
-    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="DEBUG" additivity="false">
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="INFO" additivity="false">
         <appender-ref ref="ACCESS_LOG"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
