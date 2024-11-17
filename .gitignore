@@ -36,3 +36,4 @@ out/
 
 ### Common ###
 .env
+/logs

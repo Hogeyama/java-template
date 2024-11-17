@@ -58,6 +58,7 @@ junit:junit:4.13.2=testCompileClasspath,testRuntimeClasspath
 net.bytebuddy:byte-buddy-agent:1.14.19=testCompileClasspath,testRuntimeClasspath
 net.bytebuddy:byte-buddy:1.14.19=testCompileClasspath,testRuntimeClasspath
 net.java.dev.jna:jna:5.13.0=testCompileClasspath,testRuntimeClasspath
+net.logstash.logback:logstash-logback-encoder:7.4=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 net.minidev:accessors-smart:2.5.1=testCompileClasspath,testRuntimeClasspath
 net.minidev:json-smart:2.5.1=testCompileClasspath,testRuntimeClasspath
 org.apache.commons:commons-compress:1.24.0=testCompileClasspath,testRuntimeClasspath
