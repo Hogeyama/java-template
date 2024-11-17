@@ -27,34 +27,46 @@ repositories {
 }
 
 dependencies {
+    // Spring
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.session:spring-session-core'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
+    // DB
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
-    implementation 'org.springframework.session:spring-session-core'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Generating OpenAPI document
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-    implementation 'org.yaml:snakeyaml:2.2'
+
+    // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
-    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
+    // Logging
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 
     // CLI parser
     implementation 'info.picocli:picocli-spring-boot-starter:4.7.6'
     annotationProcessor 'info.picocli:picocli-codegen:4.7.6'
+
+    // Null safety
     implementation 'org.jspecify:jspecify:1.0.0'
     errorprone "com.uber.nullaway:nullaway:0.12.1"
     errorprone 'com.google.errorprone:error_prone_core:2.35.1'
 
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-    runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
@@ -73,8 +85,11 @@ tasks.named('test') {
 }
 
 tasks.withType(JavaCompile) {
-  options.errorprone {
-    check("NullAway", CheckSeverity.ERROR)
-    option("NullAway:AnnotatedPackages", "com.uber")
-  }
+    // picocli
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+    // errorprone/nullaway
+    options.errorprone {
+        check("NullAway", CheckSeverity.ERROR)
+        option("NullAway:AnnotatedPackages", "com.uber")
+    }
 }
