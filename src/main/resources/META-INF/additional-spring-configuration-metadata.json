@@ -1,0 +1,14 @@
+{
+    "properties": [
+        {
+            "name": "jwt.secret",
+            "type": "java.lang.String",
+            "description": "JWTの署名に使用するシークレット。256bit"
+        },
+        {
+            "name": "cors.allowed-origins",
+            "type": "java.lang.String",
+            "description": "CORSの許可するオリジン。複数可。"
+        }
+    ]
+}
