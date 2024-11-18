@@ -56,14 +56,14 @@ public class AuthController {
     @Operation(summary = "ログイン", description = "ユーザー名とパスワードでログインし、JWTトークンを取得します")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "ログイン成功"),
-        @ApiResponse(responseCode = "400", description = "無効なユーザー名またはパスワード", 
+        @ApiResponse(responseCode = "400", description = "無効なユーザー名またはパスワード",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response) {
-        
+
         Optional<User> userOpt = userMapper.findByUsername(request.getUsername());
         if (userOpt.isEmpty() || !passwordEncoder.matches(request.getPassword(), userOpt.get().getPassword())) {
             return ResponseEntity.badRequest().body("Invalid username or password");
@@ -85,7 +85,7 @@ public class AuthController {
     @Operation(summary = "パスワード変更", description = "現在のパスワードを確認した上で、新しいパスワードに変更します")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "パスワード変更成功"),
-        @ApiResponse(responseCode = "400", description = "無効なパスワードまたはユーザーが見つかりません", 
+        @ApiResponse(responseCode = "400", description = "無効なパスワードまたはユーザーが見つかりません",
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/change-password")
