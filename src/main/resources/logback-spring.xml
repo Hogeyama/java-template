@@ -12,8 +12,6 @@
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <includeMdcKeyName>requestId</includeMdcKeyName>
-            <includeMdcKeyName>userId</includeMdcKeyName>
             <timeZone>Asia/Tokyo</timeZone>
         </encoder>
     </appender>
