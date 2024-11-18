@@ -141,6 +141,7 @@ org.springframework.security:spring-security-crypto:6.3.4=compileClasspath,produ
 org.springframework.security:spring-security-test:6.3.4=testCompileClasspath,testRuntimeClasspath
 org.springframework.security:spring-security-web:6.3.4=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.springframework.session:spring-session-core:3.3.3=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.springframework.session:spring-session-jdbc:3.3.3=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.springframework:spring-aop:6.1.14=compileClasspath,developmentOnly,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.springframework:spring-beans:6.1.14=compileClasspath,developmentOnly,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.springframework:spring-context-support:6.1.14=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
