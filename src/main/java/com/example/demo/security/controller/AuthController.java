@@ -1,31 +1,33 @@
 package com.example.demo.security.controller;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.security.entity.RevokedToken;
 import com.example.demo.security.entity.User;
-import com.example.demo.security.mapper.RevokedTokenMapper;
 import com.example.demo.security.mapper.UserMapper;
-import com.example.demo.security.service.JwtService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +42,8 @@ import static net.logstash.logback.argument.StructuredArguments.*;
 public class AuthController {
 
     private final UserMapper userMapper;
-    private final RevokedTokenMapper revokedTokenMapper;
-    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
 
     @Data
     @Schema(description = "ログインリクエスト")
@@ -62,7 +63,7 @@ public class AuthController {
         private String newPassword;
     }
 
-    @Operation(summary = "ログイン", description = "ユーザー名とパスワードでログインし、JWTトークンを取得します")
+    @Operation(summary = "ログイン", description = "ユーザー名とパスワードでログインし、セッションを開始します")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "ログイン成功"),
         @ApiResponse(responseCode = "400", description = "無効なユーザー名またはパスワード",
@@ -71,10 +72,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequest request,
-            HttpServletResponse response) {
+            HttpServletRequest httpRequest) {
 
-        log.info("login request",
-            kv("username", request.getUsername()));
+        log.info("login request", kv("username", request.getUsername()));
 
         Optional<User> userOpt = userMapper.findByUsername(request.getUsername());
         if (userOpt.isEmpty() || !passwordEncoder.matches(request.getPassword(), userOpt.get().getPassword())) {
@@ -82,14 +82,20 @@ public class AuthController {
         }
 
         User user = userOpt.get();
-        String token = jwtService.generateToken(user);
 
-        Cookie cookie = new Cookie("jwt", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true); // HTTPS環境では必須
-        cookie.setPath("/");
-        cookie.setMaxAge(86400); // 24時間
-        response.addCookie(cookie);
+        // ユーザーのロールをSpring SecurityのGrantedAuthorityに変換
+        var authorities = user.getRoles().stream()
+            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+            .collect(Collectors.toSet());
+
+        // セッションを作成し、認証情報を保存
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+            user.getUsername(), null, authorities);
+        securityContext.setAuthentication(authentication);
+
+        HttpSession session = httpRequest.getSession(true);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
 
         return ResponseEntity.ok().build();
     }
@@ -103,11 +109,9 @@ public class AuthController {
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
-            HttpServletRequest httpRequest,
-            @Parameter(description = "JWT認証トークン", required = true)
-            @CookieValue("jwt") String token) {
+            HttpServletRequest httpRequest) {
 
-        String username = jwtService.getUsername(token);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> userOpt = userMapper.findByUsername(username);
         if (userOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("User not found");
@@ -122,42 +126,24 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userMapper.updatePassword(user.getId(), user.getPassword());
 
-        // 現在のトークンを無効化
-        String jti = jwtService.getJti(token);
-        RevokedToken revokedToken = new RevokedToken();
-        revokedToken.setJti(jti);
-        revokedToken.setReason("Password changed");
-        revokedToken.setCreatedByUserId(user.getId());
-        revokedTokenMapper.insert(revokedToken);
+        // ユーザーの全セッションを削除
+        sessionRepository.findByPrincipalName(username)
+            .forEach((id, session) -> sessionRepository.deleteById(id));
 
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "ログアウト", description = "現在のセッションからログアウトし、JWTトークンを無効化します")
+    @Operation(summary = "ログアウト", description = "現在のセッションからログアウトします")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "ログアウト成功")
     })
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(
-            HttpServletResponse response,
-            @Parameter(description = "JWT認証トークン", required = true)
-            @CookieValue("jwt") String token) {
-
-        // トークンを無効化
-        String jti = jwtService.getJti(token);
-        RevokedToken revokedToken = new RevokedToken();
-        revokedToken.setJti(jti);
-        revokedToken.setReason("Logout");
-        revokedTokenMapper.insert(revokedToken);
-
-        // Cookieを削除
-        Cookie cookie = new Cookie("jwt", "");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        SecurityContextHolder.clearContext();
         return ResponseEntity.ok().build();
     }
 }
