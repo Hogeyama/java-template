@@ -13,13 +13,13 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import lombok.RequiredArgsConstructor;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
+    public SecurityConfig(String[] allowedOrigins) {
+        this.allowedOrigins = allowedOrigins;
+    }
 
     @Value("${cors.allowed-origins}")
     private String[] allowedOrigins;

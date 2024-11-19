@@ -4,6 +4,9 @@ import lombok.Data;
 import java.time.OffsetDateTime;
 import java.util.Set;
 
+import org.jspecify.annotations.NullUnmarked;
+
+@NullUnmarked
 @Data
 public class User {
     private Long id;

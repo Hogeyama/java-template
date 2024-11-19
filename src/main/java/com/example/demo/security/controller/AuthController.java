@@ -1,8 +1,11 @@
 package com.example.demo.security.controller;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.NullUnmarked;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,36 +32,50 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import static net.logstash.logback.argument.StructuredArguments.*;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 @Tag(name = "Authentication", description = "認証関連のAPI")
 public class AuthController {
+    public AuthController(
+                UserMapper userMapper,
+                PasswordEncoder passwordEncoder,
+                FindByIndexNameSessionRepository<? extends Session> sessionRepository) {
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.sessionRepository = sessionRepository;
+    }
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
 
     @Data
+    @NullUnmarked // LombokとNullAwayの相性問題で必要
     @Schema(description = "ログインリクエスト")
     public static class LoginRequest {
+        @NotNull(message = "Username is required")
         @Schema(description = "ユーザー名", example = "user1")
         private String username;
+
+        @NotNull(message = "Username is required")
         @Schema(description = "パスワード", example = "password123")
         private String password;
     }
 
     @Data
+    @NullUnmarked
     @Schema(description = "パスワード変更リクエスト")
     public static class ChangePasswordRequest {
+        @NotNull(message = "Old password is required")
         @Schema(description = "現在のパスワード", example = "oldPassword123")
         private String oldPassword;
+
+        @NotNull(message = "New password is required")
         @Schema(description = "新しいパスワード", example = "newPassword123")
         private String newPassword;
     }
