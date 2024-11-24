@@ -11,12 +11,16 @@ import com.example.demo.security.domain.User;
 @Mapper
 public interface UserMapper {
   @Select("SELECT * FROM users WHERE username = #{username}")
-  @Results({@Result(property = "id", column = "id"), @Result(property = "roles", column = "id",
-      javaType = Set.class, many = @Many(select = "findRolesByUserId"))})
+  @Results({//
+      @Result(property = "id", column = "id"), //
+      @Result(property = "roles", column = "id", //
+          javaType = Set.class, //
+          many = @Many(select = "findRolesByUserId"))})
   Optional<User> findByUsername(String username);
 
-  @Select("SELECT r.* FROM roles r " + "INNER JOIN user_roles ur ON r.id = ur.role_id "
-      + "WHERE ur.user_id = #{userId}")
+  @Select("SELECT r.* FROM roles r" //
+      + " INNER JOIN user_roles ur ON r.id = ur.role_id" //
+      + " WHERE ur.user_id = #{userId}")
   Set<Role> findRolesByUserId(Long userId);
 
   @Insert("INSERT INTO users (username, password, email, enabled) "

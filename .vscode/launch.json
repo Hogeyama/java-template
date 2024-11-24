@@ -2,11 +2,11 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Spring Boot-DemoApplication<demo>",
+      "name": "Spring Boot-Server<server>",
       "request": "launch",
       "cwd": "${workspaceFolder}",
-      "mainClass": "com.example.demo.DemoApplication",
-      "projectName": "demo",
+      "mainClass": "com.example.demo.Server",
+      "projectName": "server",
       "args": "",
       "envFile": "${workspaceFolder}/.env"
     }

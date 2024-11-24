@@ -1,1 +1,5 @@
 rootProject.name = 'demo'
+
+include 'common'
+include 'server'
+include 'command'

@@ -1,0 +1,16 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':common')
+
+    // CLI parser
+    implementation 'info.picocli:picocli-spring-boot-starter:4.7.6'
+    annotationProcessor 'info.picocli:picocli-codegen:4.7.6'
+}
+
+tasks.withType(JavaCompile) {
+    // picocli
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}

@@ -36,4 +36,4 @@ out/
 
 ### Common ###
 .env
-/logs
+/server/logs

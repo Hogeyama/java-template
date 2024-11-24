@@ -1,104 +1,110 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.4.0'
+    id "net.ltgt.errorprone" version "4.1.0" apply false
+    id 'org.springframework.boot' version '3.4.0' apply false
+    id 'com.diffplug.spotless' version '6.25.0' apply false
     id 'io.spring.dependency-management' version '1.1.6'
-    id "net.ltgt.errorprone" version "4.1.0"
-    id 'com.diffplug.spotless' version '6.25.0'
 }
 
 import net.ltgt.gradle.errorprone.CheckSeverity
 
-group = 'com.example'
-version = '0.0.1-SNAPSHOT'
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+allprojects {
+    repositories {
+        mavenCentral()
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'net.ltgt.errorprone'
+    apply plugin: 'com.diffplug.spotless'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    group = 'com.example'
+    version = '0.0.1-SNAPSHOT'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
     }
-}
 
-repositories {
-    mavenCentral()
-}
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
 
-dependencies {
-    // Spring
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.session:spring-session-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.session:spring-session-core'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    // developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+    dependencyManagement {
+        imports {
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+        }
+    }
 
-    // DB
-    implementation 'org.flywaydb:flyway-core'
-    implementation 'org.flywaydb:flyway-database-postgresql'
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
-    runtimeOnly 'org.postgresql:postgresql'
+    dependencies {
+        // Spring
+        implementation 'org.springframework.boot:spring-boot-starter-mail'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.session:spring-session-jdbc'
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        implementation 'org.springframework.session:spring-session-core'
 
-    // Generating OpenAPI document
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+        // DB
+        implementation 'org.flywaydb:flyway-core'
+        implementation 'org.flywaydb:flyway-database-postgresql'
+        implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+        runtimeOnly 'org.postgresql:postgresql'
 
-    // JWT
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+        // Generating OpenAPI document
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
-    // Logging
-    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+        // JWT
+        implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+        runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+        runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
-    // CLI parser
-    implementation 'info.picocli:picocli-spring-boot-starter:4.7.6'
-    annotationProcessor 'info.picocli:picocli-codegen:4.7.6'
+        // Logging
+        implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 
-    // Null safety
-    implementation 'org.jspecify:jspecify:1.0.0'
-    errorprone "com.uber.nullaway:nullaway:0.12.1"
-    errorprone 'com.google.errorprone:error_prone_core:2.35.1'
+        // Null safety
+        implementation 'org.jspecify:jspecify:1.0.0'
+        errorprone "com.uber.nullaway:nullaway:0.12.1"
+        errorprone 'com.google.errorprone:error_prone_core:2.35.1'
 
-    // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+        // Lombok
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
 
-    // Testing
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:postgresql'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        // Testing
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+        testImplementation 'org.springframework.security:spring-security-test'
+        testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
+        testImplementation 'org.testcontainers:junit-jupiter'
+        testImplementation 'org.testcontainers:postgresql'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+    tasks.withType(JavaCompile) {
+        options.errorprone {
+            check("NullAway", CheckSeverity.ERROR)
+            option("NullAway:AnnotatedPackages", "com.uber")
+        }
+    }
+
+    spotless {
+        java {
+            eclipse().configFile rootProject.file("spotless.xml")
+        }
+    }
 }
 
 dependencyLocking {
     lockAllConfigurations()
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
-tasks.withType(JavaCompile) {
-    // picocli
-    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
-    // errorprone/nullaway
-    options.errorprone {
-        check("NullAway", CheckSeverity.ERROR)
-        option("NullAway:AnnotatedPackages", "com.uber")
-    }
-}
-
-spotless {
-    java {
-        eclipse().configFile project.file("spotless.xml")
-    }
 }
