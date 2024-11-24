@@ -1,9 +1,7 @@
 services:
   postgres:
-    image: 'postgres:15.8'
+    image: "postgres:15.8"
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
     ports:
-      - '5432:5432'
+      - "5432:5432"
