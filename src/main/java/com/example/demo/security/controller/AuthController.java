@@ -5,8 +5,8 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jspecify.annotations.NullUnmarked;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -33,7 +33,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -42,9 +41,9 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Authentication", description = "認証関連のAPI")
 public class AuthController {
     public AuthController(
-                UserMapper userMapper,
-                PasswordEncoder passwordEncoder,
-                FindByIndexNameSessionRepository<? extends Session> sessionRepository) {
+            UserMapper userMapper,
+            PasswordEncoder passwordEncoder,
+            FindByIndexNameSessionRepository<? extends Session> sessionRepository) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.sessionRepository = sessionRepository;
@@ -54,36 +53,27 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
 
-    @Data
-    @NullUnmarked // LombokとNullAwayの相性問題で必要
+    // --------------------------------------------------------------------------------------------
+    // ログイン
+
     @Schema(description = "ログインリクエスト")
-    public static class LoginRequest {
-        @NotNull(message = "Username is required")
-        @Schema(description = "ユーザー名", example = "user1")
-        private String username;
+    public static record LoginRequest(
+            @NotNull(message = "Username is required") //
+            @Schema(description = "ユーザー名", example = "user1") //
+            String username,
 
-        @NotNull(message = "Username is required")
-        @Schema(description = "パスワード", example = "password123")
-        private String password;
-    }
-
-    @Data
-    @NullUnmarked
-    @Schema(description = "パスワード変更リクエスト")
-    public static class ChangePasswordRequest {
-        @NotNull(message = "Old password is required")
-        @Schema(description = "現在のパスワード", example = "oldPassword123")
-        private String oldPassword;
-
-        @NotNull(message = "New password is required")
-        @Schema(description = "新しいパスワード", example = "newPassword123")
-        private String newPassword;
+            @NotNull(message = "Password is required") //
+            @Schema(description = "パスワード", example = "password123") //
+            String password) {
     }
 
     @Operation(summary = "ログイン", description = "ユーザー名とパスワードでログインし、セッションを開始します")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "ログイン成功"),
-        @ApiResponse(responseCode = "400", description = "無効なユーザー名またはパスワード",
+            @ApiResponse(responseCode = "200", //
+                    description = "ログイン成功", //
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", //
+                    description = "無効なユーザー名またはパスワード", //
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/login")
@@ -91,10 +81,11 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest) {
 
-        log.info("login request", kv("username", request.getUsername()));
+        log.info("login request", kv("username", request.username()));
 
-        Optional<User> userOpt = userMapper.findByUsername(request.getUsername());
-        if (userOpt.isEmpty() || !passwordEncoder.matches(request.getPassword(), userOpt.get().getPassword())) {
+        Optional<User> userOpt = userMapper.findByUsername(request.username());
+        if (userOpt.isEmpty() ||
+                !passwordEncoder.matches(request.password(), userOpt.get().getPassword())) {
             return ResponseEntity.badRequest().body("Invalid username or password");
         }
 
@@ -102,25 +93,58 @@ public class AuthController {
 
         // ユーザーのロールをSpring SecurityのGrantedAuthorityに変換
         var authorities = user.getRoles().stream()
-            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-            .collect(Collectors.toSet());
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                .collect(Collectors.toSet());
 
         // セッションを作成し、認証情報を保存
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        Authentication authentication = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-            user.getUsername(), null, authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getUsername(), null, authorities);
         securityContext.setAuthentication(authentication);
 
         HttpSession session = httpRequest.getSession(true);
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                securityContext);
 
         return ResponseEntity.ok().build();
     }
 
+    // --------------------------------------------------------------------------------------------
+    // ログアウト
+
+    @Operation(summary = "ログアウト", description = "現在のセッションからログアウトします")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "ログアウト成功")
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok().build();
+    }
+    // --------------------------------------------------------------------------------------------
+    // パスワード変更
+
+    @Schema(description = "パスワード変更リクエスト")
+    public static record ChangePasswordRequest(
+            @NotNull(message = "Old password is required") //
+            @Schema(description = "現在のパスワード", example = "oldPassword123") //
+            String oldPassword,
+
+            @NotNull(message = "New password is required") //
+            @Schema(description = "新しいパスワード", example = "newPassword123") //
+            String newPassword) {
+    }
+
     @Operation(summary = "パスワード変更", description = "現在のパスワードを確認した上で、新しいパスワードに変更します")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "パスワード変更成功"),
-        @ApiResponse(responseCode = "400", description = "無効なパスワードまたはユーザーが見つかりません",
+            @ApiResponse(responseCode = "200", //
+                    description = "パスワード変更成功"),
+            @ApiResponse(responseCode = "400", //
+                    description = "無効なパスワードまたはユーザーが見つかりません", //
                     content = @Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping("/change-password")
@@ -135,32 +159,19 @@ public class AuthController {
         }
 
         User user = userOpt.get();
-        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
             return ResponseEntity.badRequest().body("Invalid old password");
         }
 
         // パスワードを更新
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
         userMapper.updatePassword(user.getId(), user.getPassword());
 
         // ユーザーの全セッションを削除
         sessionRepository.findByPrincipalName(username)
-            .forEach((id, session) -> sessionRepository.deleteById(id));
+                .forEach((id, session) -> sessionRepository.deleteById(id));
 
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "ログアウト", description = "現在のセッションからログアウトします")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "ログアウト成功")
-    })
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        SecurityContextHolder.clearContext();
-        return ResponseEntity.ok().build();
-    }
 }
