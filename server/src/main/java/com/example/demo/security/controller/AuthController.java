@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.security.domain.User;
-import com.example.demo.security.infra.UserMapper;
+import com.example.demo.security.infra.UserMapper; // TODO AuthUseCaseを経由する
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
