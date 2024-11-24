@@ -4,4 +4,4 @@ set -euo pipefail
 spring=$!
 trap 'kill $spring' EXIT
 sleep 10 # TODO replace with health check
-curl -ifsSL http://localhost:8080/doc.yaml >openapi.yaml
+curl -fsSL http://localhost:8080/doc.yaml >openapi.yaml
