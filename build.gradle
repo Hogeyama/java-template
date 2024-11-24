@@ -36,7 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.session:spring-session-core'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+    // developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 
     // DB
     implementation 'org.flywaydb:flyway-core'
