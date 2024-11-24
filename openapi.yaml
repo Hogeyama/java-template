@@ -1,17 +1,3 @@
-HTTP/1.1 200 
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Type: application/vnd.oai.openapi
-Content-Length: 3157
-Date: Sun, 17 Nov 2024 16:10:33 GMT
-
 openapi: 3.0.1
 info:
   title: OpenAPI definition
@@ -28,15 +14,8 @@ paths:
       tags:
       - Authentication
       summary: ログアウト
-      description: 現在のセッションからログアウトし、JWTトークンを無効化します
+      description: 現在のセッションからログアウトします
       operationId: logout
-      parameters:
-      - name: jwt
-        in: cookie
-        description: JWT認証トークン
-        required: true
-        schema:
-          type: string
       responses:
         "200":
           description: ログアウト成功
@@ -49,7 +28,7 @@ paths:
       tags:
       - Authentication
       summary: ログイン
-      description: ユーザー名とパスワードでログインし、JWTトークンを取得します
+      description: ユーザー名とパスワードでログインし、セッションを開始します
       operationId: login
       requestBody:
         content:
@@ -77,13 +56,6 @@ paths:
       summary: パスワード変更
       description: 現在のパスワードを確認した上で、新しいパスワードに変更します
       operationId: changePassword
-      parameters:
-      - name: jwt
-        in: cookie
-        description: JWT認証トークン
-        required: true
-        schema:
-          type: string
       requestBody:
         content:
           application/json:
@@ -106,6 +78,9 @@ paths:
 components:
   schemas:
     LoginRequest:
+      required:
+      - password
+      - username
       type: object
       properties:
         username:
@@ -118,6 +93,9 @@ components:
           example: password123
       description: ログインリクエスト
     ChangePasswordRequest:
+      required:
+      - newPassword
+      - oldPassword
       type: object
       properties:
         oldPassword:
