@@ -1,12 +1,15 @@
 {
-  "java.compile.nullAnalysis.nullable": [
-    "org.jspecify.annotations.Nullable"
-  ],
+  "java.compile.nullAnalysis.nullable": ["org.jspecify.annotations.Nullable"],
   "java.compile.nullAnalysis.nonnullbydefault": [
     "org.jspecify.annotations.NullMarked"
   ],
   "java.compile.nullAnalysis.mode": "automatic",
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx16G -Xms100m -Xlog:disable",
-  "java.search.scope": "all"
+  "java.search.scope": "all",
+  "java.format.settings.url": "spotless.xml",
+  "[java]": {
+    "spotlessGradle.format.enable": true,
+    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
+  }
 }
