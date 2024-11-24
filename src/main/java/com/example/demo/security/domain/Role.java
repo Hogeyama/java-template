@@ -1,4 +1,4 @@
-package com.example.demo.security.entity;
+package com.example.demo.security.domain;
 
 import java.time.OffsetDateTime;
 

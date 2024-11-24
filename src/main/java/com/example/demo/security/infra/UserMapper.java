@@ -1,12 +1,12 @@
-package com.example.demo.security.mapper;
+package com.example.demo.security.infra;
 
 import java.util.Optional;
 import java.util.Set;
 
 import org.apache.ibatis.annotations.*;
 
-import com.example.demo.security.entity.Role;
-import com.example.demo.security.entity.User;
+import com.example.demo.security.domain.Role;
+import com.example.demo.security.domain.User;
 
 @Mapper
 public interface UserMapper {
