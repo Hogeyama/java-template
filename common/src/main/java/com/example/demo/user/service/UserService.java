@@ -1,6 +1,6 @@
 package com.example.demo.user.service;
 
-import com.example.demo.user.db.UserRepositoryImpl;
+import com.example.demo.user.db.UserRepository;
 import com.example.demo.user.entity.User;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-  private final UserRepositoryImpl userRepository;
+  private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
   // ----------------------------------------------------------------------------------------------

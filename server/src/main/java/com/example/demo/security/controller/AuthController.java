@@ -2,9 +2,9 @@ package com.example.demo.security.controller;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import com.example.demo.user.db.UserRepository;
 import com.example.demo.user.entity.Role;
 import com.example.demo.user.entity.User;
-import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.service.UserService;
 import com.example.demo.user.service.UserService.AuthResult;
 import io.swagger.v3.oas.annotations.Operation;
