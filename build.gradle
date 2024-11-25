@@ -2,6 +2,7 @@ plugins {
     id "net.ltgt.errorprone" version "4.1.0" apply false
     id 'org.springframework.boot' version '3.4.0' apply false
     id 'com.diffplug.spotless' version '6.25.0' apply false
+    id 'nu.studer.jooq' version "9.0"
     id 'io.spring.dependency-management' version '1.1.6'
 }
 
@@ -43,6 +44,7 @@ subprojects {
 
     dependencies {
         // Spring
+        implementation 'org.springframework.boot:spring-boot-starter-jooq'
         implementation 'org.springframework.boot:spring-boot-starter-mail'
         implementation 'org.springframework.boot:spring-boot-starter-security'
         implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -103,8 +105,61 @@ subprojects {
             googleJavaFormat().formatJavadoc(false)
         }
     }
+
+    dependencyLocking {
+        lockFile.set(file("${projectDir}/gradle.lockfile"))
+        lockAllConfigurations()
+    }
 }
 
-dependencyLocking {
-    lockAllConfigurations()
+jooq {
+    // Springと同じバージョンを使う
+    version = dependencyManagement.importedProperties['jooq.version']
+
+    configurations {
+        main {
+            generateSchemaSourceOnCompilation = true  // default (can be omitted)
+
+            generationTool {
+                jdbc {
+                    driver = 'org.postgresql.Driver'
+                    // compose.yamlと合わせる
+                    url = 'jdbc:postgresql://localhost:5432/postgres'
+                    user = 'postgres'
+                    password = ''
+                }
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        inputSchema = 'public'
+                        excludes = 'flyway_schema_history|spring_session.*'
+                    }
+                    generate {
+                        deprecated = false
+                        daos = true
+                        records = true
+                        immutablePojos = true
+                        fluentSetters = true
+                        springAnnotations = true
+                    }
+                    target {
+                        packageName = 'com.example.demo.jooq'
+                        directory = 'jooq/src/main/java'
+                    }
+                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    jooqGenerator 'org.postgresql:postgresql:42.5.4'
+}
+
+tasks.named('generateJooq').configure {
+    launcher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
