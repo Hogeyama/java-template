@@ -1,7 +1,7 @@
-package com.example.demo.security.infra;
+package com.example.demo.user.db;
 
-import com.example.demo.security.domain.Role;
-import com.example.demo.security.domain.User;
+import com.example.demo.user.entity.Role;
+import com.example.demo.user.entity.User;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.ibatis.annotations.*;

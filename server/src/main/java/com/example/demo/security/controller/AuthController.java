@@ -2,8 +2,10 @@ package com.example.demo.security.controller;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import com.example.demo.security.domain.User;
-import com.example.demo.security.infra.UserMapper; // TODO AuthUseCaseを経由する
+import com.example.demo.user.entity.User;
+import com.example.demo.user.repository.UserRepository;
+import com.example.demo.user.service.UserService;
+import com.example.demo.user.service.UserService.AuthResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,6 +18,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,18 +38,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 @Tag(name = "Authentication", description = "認証関連のAPI")
 public class AuthController {
-  public AuthController(
-      UserMapper userMapper,
-      PasswordEncoder passwordEncoder,
-      FindByIndexNameSessionRepository<? extends Session> sessionRepository) {
-    this.userMapper = userMapper;
-    this.passwordEncoder = passwordEncoder;
-    this.sessionRepository = sessionRepository;
-  }
-
-  private final UserMapper userMapper;
+  private final UserRepository userRepository;
+  private final UserService userService;
   private final PasswordEncoder passwordEncoder;
   private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
 
@@ -54,24 +50,23 @@ public class AuthController {
   // ログイン
 
   @Schema(description = "ログインリクエスト")
-  public static record LoginRequest( //
-      @NotNull(message = "Username is required") //
-          @Schema(description = "ユーザー名", example = "user1") //
-          String username, //
-      @NotNull(message = "Password is required") //
-          @Schema(description = "パスワード", example = "password123") //
+  public static record LoginRequest(
+      @NotNull(message = "Username is required") @Schema(description = "ユーザー名", example = "user1")
+          String username,
+      @NotNull(message = "Password is required")
+          @Schema(description = "パスワード", example = "password123")
           String password) {}
 
   @Operation(summary = "ログイン", description = "ユーザー名とパスワードでログインし、セッションを開始します")
   @ApiResponses(
-      value = { //
+      value = {
         @ApiResponse(
-            responseCode = "200", //
-            description = "ログイン成功", //
+            responseCode = "200",
+            description = "ログイン成功",
             content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(
-            responseCode = "400", //
-            description = "無効なユーザー名またはパスワード", //
+            responseCode = "400",
+            description = "無効なユーザー名またはパスワード",
             content = @Content(schema = @Schema(implementation = String.class)))
       })
   @PostMapping("/login")
@@ -80,31 +75,38 @@ public class AuthController {
 
     log.info("login request", kv("username", request.username()));
 
-    Optional<User> userOpt = userMapper.findByUsername(request.username());
-    if (userOpt.isEmpty()
-        || !passwordEncoder.matches(request.password(), userOpt.get().getPassword())) {
-      return ResponseEntity.badRequest().body("Invalid username or password");
+    var result =
+        userService.login(new UserService.AuthChallange(request.username(), request.password()));
+
+    switch (result) {
+      case AuthResult.Success(var user) -> {
+        // ユーザーのロールをSpring SecurityのGrantedAuthorityに変換
+        var authorities =
+            user.roles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                .collect(Collectors.toSet());
+
+        // セッションを作成し、認証情報を保存
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = //
+            new UsernamePasswordAuthenticationToken(user.username(), null, authorities);
+        securityContext.setAuthentication(authentication);
+
+        HttpSession session = httpRequest.getSession(true);
+        session.setAttribute(
+            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+
+        return ResponseEntity.ok().build();
+      }
+
+      case AuthResult.UserNotFound() -> {
+        return ResponseEntity.badRequest().body("Invalid username or password");
+      }
+
+      case AuthResult.WrongPassword() -> {
+        return ResponseEntity.badRequest().body("Invalid username or password");
+      }
     }
-
-    User user = userOpt.get();
-
-    // ユーザーのロールをSpring SecurityのGrantedAuthorityに変換
-    var authorities =
-        user.getRoles().stream()
-            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-            .collect(Collectors.toSet());
-
-    // セッションを作成し、認証情報を保存
-    SecurityContext securityContext = SecurityContextHolder.getContext();
-    Authentication authentication = //
-        new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
-    securityContext.setAuthentication(authentication);
-
-    HttpSession session = httpRequest.getSession(true);
-    session.setAttribute(
-        HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-
-    return ResponseEntity.ok().build();
   }
 
   // --------------------------------------------------------------------------------------------
@@ -151,19 +153,19 @@ public class AuthController {
       @Valid @RequestBody ChangePasswordRequest request, HttpServletRequest httpRequest) {
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    Optional<User> userOpt = userMapper.findByUsername(username);
+    Optional<User> userOpt = userRepository.findByUsername(username);
     if (userOpt.isEmpty()) {
       return ResponseEntity.badRequest().body("User not found");
     }
 
     User user = userOpt.get();
-    if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
+    if (!passwordEncoder.matches(request.oldPassword(), user.password())) {
       return ResponseEntity.badRequest().body("Invalid old password");
     }
 
     // パスワードを更新
-    user.setPassword(passwordEncoder.encode(request.newPassword()));
-    userMapper.updatePassword(user.getId(), user.getPassword());
+    var newPassword = passwordEncoder.encode(request.newPassword());
+    userRepository.updatePassword(user.id(), newPassword);
 
     // ユーザーの全セッションを削除
     sessionRepository

@@ -1,4 +1,4 @@
-package com.example.demo.security.domain;
+package com.example.demo.user.entity;
 
 import java.time.OffsetDateTime;
 import lombok.Data;
