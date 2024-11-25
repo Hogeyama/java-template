@@ -2,6 +2,7 @@ package com.example.demo.security.controller;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import com.example.demo.user.entity.Role;
 import com.example.demo.user.entity.User;
 import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.service.UserService;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,14 +78,16 @@ public class AuthController {
     log.info("login request", kv("username", request.username()));
 
     var result =
-        userService.login(new UserService.AuthChallange(request.username(), request.password()));
+        userService.authenticate(
+            new UserService.AuthChallange(request.username(), request.password()));
 
     switch (result) {
       case AuthResult.Success(var user) -> {
         // ユーザーのロールをSpring SecurityのGrantedAuthorityに変換
+        Set<Role> roles = (user.roles() == null) ? Set.of() : user.roles();
         var authorities =
-            user.roles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+            roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .collect(Collectors.toSet());
 
         // セッションを作成し、認証情報を保存

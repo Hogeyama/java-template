@@ -1,7 +1,7 @@
 package com.example.demo.user.service;
 
+import com.example.demo.user.db.UserRepositoryImpl;
 import com.example.demo.user.entity.User;
-import com.example.demo.user.repository.UserRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-  private final UserRepository userRepository;
+  private final UserRepositoryImpl userRepository;
   private final PasswordEncoder passwordEncoder;
 
   // ----------------------------------------------------------------------------------------------
@@ -48,17 +48,21 @@ public class UserService {
     public record WrongPassword() implements AuthResult {}
   }
 
-  public AuthResult login(AuthChallange request) {
+  public AuthResult authenticate(AuthChallange request) {
+    log.info("Authenticate request: {}", request);
     Optional<User> userOpt = userRepository.findByUsername(request.username());
     if (userOpt.isEmpty()) {
+      log.info("User not found: {}", request.username());
       return new AuthResult.UserNotFound();
     }
 
     User user = userOpt.get();
     if (!passwordEncoder.matches(request.password(), user.password())) {
+      log.info("Wrong password for user: {}", request.username());
       return new AuthResult.WrongPassword();
     }
 
+    log.info("User authenticated: {}", request.username());
     return new AuthResult.Success(user);
   }
 }
