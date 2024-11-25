@@ -30,8 +30,11 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(session -> session.invalidSessionUrl("/api/auth/login"))
         .authorizeHttpRequests(
-            auth -> auth.requestMatchers("/api/auth/login", "/doc.yaml", "/doc/**").permitAll()
-                .anyRequest().authenticated());
+            auth ->
+                auth.requestMatchers("/api/auth/login", "/doc.yaml", "/doc/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated());
 
     return http.build();
   }

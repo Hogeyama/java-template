@@ -100,7 +100,7 @@ subprojects {
 
     spotless {
         java {
-            eclipse().configFile rootProject.file("spotless.xml")
+            googleJavaFormat().formatJavadoc(false)
         }
     }
 }

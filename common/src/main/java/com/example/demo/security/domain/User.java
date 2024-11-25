@@ -2,10 +2,8 @@ package com.example.demo.security.domain;
 
 import java.time.OffsetDateTime;
 import java.util.Set;
-
-import org.jspecify.annotations.NullUnmarked;
-
 import lombok.Data;
+import org.jspecify.annotations.NullUnmarked;
 
 @NullUnmarked
 @Data
