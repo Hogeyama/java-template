@@ -31,7 +31,7 @@ public class SecurityConfig {
         .sessionManagement(session -> session.invalidSessionUrl("/api/auth/login"))
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/auth/login", "/doc.yaml", "/doc/**")
+                auth.requestMatchers("/api/auth/login", "/api/auth/signup", "/doc.yaml", "/doc/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated());

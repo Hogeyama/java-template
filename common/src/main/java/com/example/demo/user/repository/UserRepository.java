@@ -1,4 +1,4 @@
-package com.example.demo.user.db;
+package com.example.demo.user.repository;
 
 import static com.example.demo.jooq.tables.Roles.ROLES;
 import static com.example.demo.jooq.tables.UserRoles.USER_ROLES;
@@ -7,6 +7,7 @@ import static org.jooq.impl.DSL.multiset;
 import static org.jooq.impl.DSL.select;
 
 import com.example.demo.jooq.tables.records.RolesRecord;
+import com.example.demo.jooq.tables.records.UserRolesRecord;
 import com.example.demo.jooq.tables.records.UsersRecord;
 import com.example.demo.user.entity.Role;
 import com.example.demo.user.entity.User;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
+import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
@@ -53,19 +55,36 @@ public class UserRepository {
     }
   }
 
-  public enum InsertResult {
-    SUCCESS,
-    ALREADY_EXISTS
+  public sealed interface InsertResult permits InsertResult.Success, InsertResult.AlreadyExists {
+    public record Success() implements InsertResult {}
+
+    public record AlreadyExists() implements InsertResult {}
   }
 
   public InsertResult insert(User user) {
-    // TODO
-    return InsertResult.SUCCESS;
+    try {
+      // Unique violationのときはここまでrollbackされる
+      dsl.transaction(
+          tx -> {
+            var userR = toRecord(user);
+            var userRolesR =
+                user.roles().stream()
+                    .map(role -> new UserRolesRecord(user.id(), role.id(), role.createdAt()))
+                    .collect(Collectors.toSet());
+            tx.dsl().insertInto(USERS).set(userR).execute();
+            tx.dsl().batchInsert(userRolesR).execute();
+          });
+      return new InsertResult.Success();
+    } catch (DataAccessException e) {
+      if (e.sqlState().equals("23505")) { // Unique violation
+        return new InsertResult.AlreadyExists();
+      } else {
+        throw e;
+      }
+    }
   }
 
-  public void updatePassword(Long id, String password) {
-    // TODO
-  }
+  public void changePassword(Long id, User.PasswordHash passwordHash) {}
 
   // --------------------------------------------------------------------------------------------
   // Helper
@@ -74,7 +93,7 @@ public class UserRepository {
     return new User(
         r.getId(),
         r.getUsername(),
-        r.getPassword(),
+        User.PasswordHash.unsafeOf(r.getPassword()),
         r.getEmail(),
         r.getEnabled(),
         r.getCreatedAt(),
@@ -84,5 +103,16 @@ public class UserRepository {
 
   private static Role fromRecord(RolesRecord r) {
     return new Role(r.getId(), r.getName(), r.getCreatedAt());
+  }
+
+  private static UsersRecord toRecord(User user) {
+    return new UsersRecord(
+        user.id(),
+        user.username(),
+        user.passwordHash().asString(),
+        user.email(),
+        user.enabled(),
+        user.createdAt(),
+        user.updatedAt());
   }
 }
