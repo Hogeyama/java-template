@@ -14,6 +14,10 @@ public sealed interface Either<T, U> permits Either.Left, Either.Right {
   <S> S either(
       Function<? super T, ? extends S> leftMapper, Function<? super U, ? extends S> rightMapper);
 
+  boolean isLeft();
+
+  boolean isRight();
+
   public record Left<T, U>(T value) implements Either<T, U> {
     public static <T, U> Left<T, U> of(T value) {
       return new Left<>(value);
@@ -23,6 +27,16 @@ public sealed interface Either<T, U> permits Either.Left, Either.Right {
     public <S> S either(
         Function<? super T, ? extends S> leftMapper, Function<? super U, ? extends S> rightMapper) {
       return leftMapper.apply(value);
+    }
+
+    @Override
+    public boolean isLeft() {
+      return true;
+    }
+
+    @Override
+    public boolean isRight() {
+      return false;
     }
   }
 
@@ -35,6 +49,16 @@ public sealed interface Either<T, U> permits Either.Left, Either.Right {
     public <S> S either(
         Function<? super T, ? extends S> leftMapper, Function<? super U, ? extends S> rightMapper) {
       return rightMapper.apply(value);
+    }
+
+    @Override
+    public boolean isLeft() {
+      return false;
+    }
+
+    @Override
+    public boolean isRight() {
+      return true;
     }
   }
 }

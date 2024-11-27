@@ -66,14 +66,15 @@ public class AuthController {
 
     return switch (result) {
       case CreateUserResult.Success(var user) -> {
+        log.info("User created: {}", user.getUsername());
         yield ResponseEntity.ok().build();
       }
 
       case CreateUserResult.AlreadyExists() -> {
-        yield ResponseEntity.badRequest().body("User already exists");
+        yield ResponseEntity.badRequest().body("Username already exists");
       }
 
-      case CreateUserResult.InvalidPassword() -> {
+      case CreateUserResult.InvalidInput(var e) -> {
         yield ResponseEntity.badRequest().body("Invalid password");
       }
     };

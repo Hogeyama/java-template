@@ -75,8 +75,8 @@ public class UserRepository {
           tx -> {
             var userR = toRecord(user);
             var userRolesR =
-                user.roles().stream()
-                    .map(role -> new UserRolesRecord(user.id(), role.id(), role.createdAt()))
+                user.getRoles().stream()
+                    .map(role -> new UserRolesRecord(user.getId(), role.id(), role.createdAt()))
                     .collect(Collectors.toSet());
             tx.dsl().insertInto(USERS).set(userR).execute();
             tx.dsl().batchInsert(userRolesR).execute();
@@ -113,7 +113,7 @@ public class UserRepository {
   // Helper
 
   private static User fromRecord(UsersRecord r, Set<RolesRecord> roles) {
-    return new User(
+    return User.unsafeOf(
         r.getId(),
         r.getUsername(),
         User.PasswordHash.unsafeOf(r.getPassword()),
@@ -130,12 +130,12 @@ public class UserRepository {
 
   private static UsersRecord toRecord(User user) {
     return new UsersRecord(
-        user.id(),
-        user.username(),
-        user.passwordHash().asString(),
-        user.email(),
-        user.enabled(),
-        user.createdAt(),
-        user.updatedAt());
+        user.getId(),
+        user.getUsername(),
+        user.getPasswordHash().asString(),
+        user.getEmail(),
+        user.isEnabled(),
+        user.getCreatedAt(),
+        user.getUpdatedAt());
   }
 }

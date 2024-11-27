@@ -25,7 +25,7 @@ public class SessionManager {
   // ----------------------------------------------------------------------------------------------
 
   public void createSession(HttpServletRequest req, User user) {
-    Set<Role> roles = user.roles();
+    Set<Role> roles = user.getRoles();
     var authorities =
         roles.stream()
             .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
@@ -33,7 +33,7 @@ public class SessionManager {
 
     SecurityContext securityContext = SecurityContextHolder.getContext();
     Authentication authentication =
-        new UsernamePasswordAuthenticationToken(user.username(), null, authorities);
+        new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
     securityContext.setAuthentication(authentication);
 
     HttpSession session = req.getSession(true);
