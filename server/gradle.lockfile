@@ -12,6 +12,7 @@ com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.18.1=compileClasspath,pro
 com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.1=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.fasterxml.jackson.module:jackson-module-parameter-names:2.18.1=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.fasterxml.jackson:jackson-bom:2.18.1=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.uuid:java-uuid-generator:5.1.0=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.fasterxml:classmate:1.7.0=compileClasspath,productionRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.github.ben-manes.caffeine:caffeine:3.1.8=annotationProcessor,compileClasspath,testAnnotationProcessor
 com.github.docker-java:docker-java-api:3.4.0=testCompileClasspath,testRuntimeClasspath
