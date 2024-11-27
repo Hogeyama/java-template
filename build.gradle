@@ -9,6 +9,8 @@ plugins {
 import net.ltgt.gradle.errorprone.CheckSeverity
 
 allprojects {
+    task dependenciesForAll(type: DependencyReportTask)
+
     repositories {
         mavenCentral()
     }
