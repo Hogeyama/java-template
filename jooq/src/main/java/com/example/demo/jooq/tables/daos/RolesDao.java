@@ -10,6 +10,7 @@ import com.example.demo.jooq.tables.records.RolesRecord;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 @Repository
-public class RolesDao extends DAOImpl<RolesRecord, com.example.demo.jooq.tables.pojos.Roles, Long> {
+public class RolesDao extends DAOImpl<RolesRecord, com.example.demo.jooq.tables.pojos.Roles, UUID> {
 
     /**
      * Create a new RolesDao without any configuration
@@ -40,7 +41,7 @@ public class RolesDao extends DAOImpl<RolesRecord, com.example.demo.jooq.tables.
     }
 
     @Override
-    public Long getId(com.example.demo.jooq.tables.pojos.Roles object) {
+    public UUID getId(com.example.demo.jooq.tables.pojos.Roles object) {
         return object.getId();
     }
 
@@ -48,28 +49,28 @@ public class RolesDao extends DAOImpl<RolesRecord, com.example.demo.jooq.tables.
      * Fetch records that have <code>id BETWEEN lowerInclusive AND
      * upperInclusive</code>
      */
-    public List<com.example.demo.jooq.tables.pojos.Roles> fetchRangeOfId(Long lowerInclusive, Long upperInclusive) {
+    public List<com.example.demo.jooq.tables.pojos.Roles> fetchRangeOfId(UUID lowerInclusive, UUID upperInclusive) {
         return fetchRange(Roles.ROLES.ID, lowerInclusive, upperInclusive);
     }
 
     /**
      * Fetch records that have <code>id IN (values)</code>
      */
-    public List<com.example.demo.jooq.tables.pojos.Roles> fetchById(Long... values) {
+    public List<com.example.demo.jooq.tables.pojos.Roles> fetchById(UUID... values) {
         return fetch(Roles.ROLES.ID, values);
     }
 
     /**
      * Fetch a unique record that has <code>id = value</code>
      */
-    public com.example.demo.jooq.tables.pojos.Roles fetchOneById(Long value) {
+    public com.example.demo.jooq.tables.pojos.Roles fetchOneById(UUID value) {
         return fetchOne(Roles.ROLES.ID, value);
     }
 
     /**
      * Fetch a unique record that has <code>id = value</code>
      */
-    public Optional<com.example.demo.jooq.tables.pojos.Roles> fetchOptionalById(Long value) {
+    public Optional<com.example.demo.jooq.tables.pojos.Roles> fetchOptionalById(UUID value) {
         return fetchOptional(Roles.ROLES.ID, value);
     }
 

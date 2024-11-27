@@ -6,26 +6,19 @@ package com.example.demo.jooq.tables;
 
 import com.example.demo.jooq.Keys;
 import com.example.demo.jooq.Public;
-import com.example.demo.jooq.tables.RevokedTokens.RevokedTokensPath;
-import com.example.demo.jooq.tables.Roles.RolesPath;
-import com.example.demo.jooq.tables.UserRoles.UserRolesPath;
 import com.example.demo.jooq.tables.records.UsersRecord;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Identity;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -63,7 +56,7 @@ public class Users extends TableImpl<UsersRecord> {
     /**
      * The column <code>public.users.id</code>.
      */
-    public final TableField<UsersRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<UsersRecord, UUID> ID = createField(DSL.name("id"), SQLDataType.UUID.nullable(false), this, "");
 
     /**
      * The column <code>public.users.username</code>.
@@ -124,45 +117,9 @@ public class Users extends TableImpl<UsersRecord> {
         this(DSL.name("users"), null);
     }
 
-    public <O extends Record> Users(Table<O> path, ForeignKey<O, UsersRecord> childPath, InverseForeignKey<O, UsersRecord> parentPath) {
-        super(path, childPath, parentPath, USERS);
-    }
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    public static class UsersPath extends Users implements Path<UsersRecord> {
-        public <O extends Record> UsersPath(Table<O> path, ForeignKey<O, UsersRecord> childPath, InverseForeignKey<O, UsersRecord> parentPath) {
-            super(path, childPath, parentPath);
-        }
-        private UsersPath(Name alias, Table<UsersRecord> aliased) {
-            super(alias, aliased);
-        }
-
-        @Override
-        public UsersPath as(String alias) {
-            return new UsersPath(DSL.name(alias), this);
-        }
-
-        @Override
-        public UsersPath as(Name alias) {
-            return new UsersPath(alias, this);
-        }
-
-        @Override
-        public UsersPath as(Table<?> alias) {
-            return new UsersPath(alias.getQualifiedName(), this);
-        }
-    }
-
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
-    }
-
-    @Override
-    public Identity<UsersRecord, Long> getIdentity() {
-        return (Identity<UsersRecord, Long>) super.getIdentity();
     }
 
     @Override
@@ -172,41 +129,7 @@ public class Users extends TableImpl<UsersRecord> {
 
     @Override
     public List<UniqueKey<UsersRecord>> getUniqueKeys() {
-        return Arrays.asList(Keys.USERS_USERNAME_KEY, Keys.USERS_EMAIL_KEY);
-    }
-
-    private transient RevokedTokensPath _revokedTokens;
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>public.revoked_tokens</code> table
-     */
-    public RevokedTokensPath revokedTokens() {
-        if (_revokedTokens == null)
-            _revokedTokens = new RevokedTokensPath(this, null, Keys.REVOKED_TOKENS__REVOKED_TOKENS_CREATED_BY_USER_ID_FKEY.getInverseKey());
-
-        return _revokedTokens;
-    }
-
-    private transient UserRolesPath _userRoles;
-
-    /**
-     * Get the implicit to-many join path to the <code>public.user_roles</code>
-     * table
-     */
-    public UserRolesPath userRoles() {
-        if (_userRoles == null)
-            _userRoles = new UserRolesPath(this, null, Keys.USER_ROLES__USER_ROLES_USER_ID_FKEY.getInverseKey());
-
-        return _userRoles;
-    }
-
-    /**
-     * Get the implicit many-to-many join path to the <code>public.roles</code>
-     * table
-     */
-    public RolesPath roles() {
-        return userRoles().roles();
+        return Arrays.asList(Keys.USERS_EMAIL_KEY, Keys.USERS_USERNAME_KEY);
     }
 
     @Override

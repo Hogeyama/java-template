@@ -6,24 +6,19 @@ package com.example.demo.jooq.tables;
 
 import com.example.demo.jooq.Keys;
 import com.example.demo.jooq.Public;
-import com.example.demo.jooq.tables.Users.UsersPath;
 import com.example.demo.jooq.tables.records.RevokedTokensRecord;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Identity;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -61,7 +56,7 @@ public class RevokedTokens extends TableImpl<RevokedTokensRecord> {
     /**
      * The column <code>public.revoked_tokens.id</code>.
      */
-    public final TableField<RevokedTokensRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<RevokedTokensRecord, UUID> ID = createField(DSL.name("id"), SQLDataType.UUID.nullable(false), this, "");
 
     /**
      * The column <code>public.revoked_tokens.jti</code>.
@@ -81,7 +76,7 @@ public class RevokedTokens extends TableImpl<RevokedTokensRecord> {
     /**
      * The column <code>public.revoked_tokens.created_by_user_id</code>.
      */
-    public final TableField<RevokedTokensRecord, Long> CREATED_BY_USER_ID = createField(DSL.name("created_by_user_id"), SQLDataType.BIGINT, this, "");
+    public final TableField<RevokedTokensRecord, UUID> CREATED_BY_USER_ID = createField(DSL.name("created_by_user_id"), SQLDataType.UUID, this, "");
 
     private RevokedTokens(Name alias, Table<RevokedTokensRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -112,45 +107,9 @@ public class RevokedTokens extends TableImpl<RevokedTokensRecord> {
         this(DSL.name("revoked_tokens"), null);
     }
 
-    public <O extends Record> RevokedTokens(Table<O> path, ForeignKey<O, RevokedTokensRecord> childPath, InverseForeignKey<O, RevokedTokensRecord> parentPath) {
-        super(path, childPath, parentPath, REVOKED_TOKENS);
-    }
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    public static class RevokedTokensPath extends RevokedTokens implements Path<RevokedTokensRecord> {
-        public <O extends Record> RevokedTokensPath(Table<O> path, ForeignKey<O, RevokedTokensRecord> childPath, InverseForeignKey<O, RevokedTokensRecord> parentPath) {
-            super(path, childPath, parentPath);
-        }
-        private RevokedTokensPath(Name alias, Table<RevokedTokensRecord> aliased) {
-            super(alias, aliased);
-        }
-
-        @Override
-        public RevokedTokensPath as(String alias) {
-            return new RevokedTokensPath(DSL.name(alias), this);
-        }
-
-        @Override
-        public RevokedTokensPath as(Name alias) {
-            return new RevokedTokensPath(alias, this);
-        }
-
-        @Override
-        public RevokedTokensPath as(Table<?> alias) {
-            return new RevokedTokensPath(alias.getQualifiedName(), this);
-        }
-    }
-
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
-    }
-
-    @Override
-    public Identity<RevokedTokensRecord, Long> getIdentity() {
-        return (Identity<RevokedTokensRecord, Long>) super.getIdentity();
     }
 
     @Override
@@ -161,23 +120,6 @@ public class RevokedTokens extends TableImpl<RevokedTokensRecord> {
     @Override
     public List<UniqueKey<RevokedTokensRecord>> getUniqueKeys() {
         return Arrays.asList(Keys.REVOKED_TOKENS_JTI_IDX);
-    }
-
-    @Override
-    public List<ForeignKey<RevokedTokensRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.REVOKED_TOKENS__REVOKED_TOKENS_CREATED_BY_USER_ID_FKEY);
-    }
-
-    private transient UsersPath _users;
-
-    /**
-     * Get the implicit join path to the <code>public.users</code> table.
-     */
-    public UsersPath users() {
-        if (_users == null)
-            _users = new UsersPath(this, Keys.REVOKED_TOKENS__REVOKED_TOKENS_CREATED_BY_USER_ID_FKEY, null);
-
-        return _users;
     }
 
     @Override

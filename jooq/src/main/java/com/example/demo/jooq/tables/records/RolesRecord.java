@@ -7,6 +7,7 @@ package com.example.demo.jooq.tables.records;
 import com.example.demo.jooq.tables.Roles;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -23,7 +24,7 @@ public class RolesRecord extends UpdatableRecordImpl<RolesRecord> {
     /**
      * Setter for <code>public.roles.id</code>.
      */
-    public RolesRecord setId(Long value) {
+    public RolesRecord setId(UUID value) {
         set(0, value);
         return this;
     }
@@ -31,8 +32,8 @@ public class RolesRecord extends UpdatableRecordImpl<RolesRecord> {
     /**
      * Getter for <code>public.roles.id</code>.
      */
-    public Long getId() {
-        return (Long) get(0);
+    public UUID getId() {
+        return (UUID) get(0);
     }
 
     /**
@@ -70,7 +71,7 @@ public class RolesRecord extends UpdatableRecordImpl<RolesRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<Long> key() {
+    public Record1<UUID> key() {
         return (Record1) super.key();
     }
 
@@ -88,7 +89,7 @@ public class RolesRecord extends UpdatableRecordImpl<RolesRecord> {
     /**
      * Create a detached, initialised RolesRecord
      */
-    public RolesRecord(Long id, String name, OffsetDateTime createdAt) {
+    public RolesRecord(UUID id, String name, OffsetDateTime createdAt) {
         super(Roles.ROLES);
 
         setId(id);

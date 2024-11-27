@@ -6,6 +6,7 @@ package com.example.demo.jooq.tables.pojos;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 
 /**
@@ -16,11 +17,11 @@ public class RevokedTokens implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final Long id;
+    private final UUID id;
     private final String jti;
     private final OffsetDateTime revokedAt;
     private final String reason;
-    private final Long createdByUserId;
+    private final UUID createdByUserId;
 
     public RevokedTokens(RevokedTokens value) {
         this.id = value.id;
@@ -31,11 +32,11 @@ public class RevokedTokens implements Serializable {
     }
 
     public RevokedTokens(
-        Long id,
+        UUID id,
         String jti,
         OffsetDateTime revokedAt,
         String reason,
-        Long createdByUserId
+        UUID createdByUserId
     ) {
         this.id = id;
         this.jti = jti;
@@ -47,7 +48,7 @@ public class RevokedTokens implements Serializable {
     /**
      * Getter for <code>public.revoked_tokens.id</code>.
      */
-    public Long getId() {
+    public UUID getId() {
         return this.id;
     }
 
@@ -75,7 +76,7 @@ public class RevokedTokens implements Serializable {
     /**
      * Getter for <code>public.revoked_tokens.created_by_user_id</code>.
      */
-    public Long getCreatedByUserId() {
+    public UUID getCreatedByUserId() {
         return this.createdByUserId;
     }
 

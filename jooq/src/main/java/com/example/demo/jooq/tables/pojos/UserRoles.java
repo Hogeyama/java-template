@@ -6,6 +6,7 @@ package com.example.demo.jooq.tables.pojos;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 
 /**
@@ -16,8 +17,8 @@ public class UserRoles implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final Long userId;
-    private final Long roleId;
+    private final UUID userId;
+    private final UUID roleId;
     private final OffsetDateTime createdAt;
 
     public UserRoles(UserRoles value) {
@@ -27,8 +28,8 @@ public class UserRoles implements Serializable {
     }
 
     public UserRoles(
-        Long userId,
-        Long roleId,
+        UUID userId,
+        UUID roleId,
         OffsetDateTime createdAt
     ) {
         this.userId = userId;
@@ -39,14 +40,14 @@ public class UserRoles implements Serializable {
     /**
      * Getter for <code>public.user_roles.user_id</code>.
      */
-    public Long getUserId() {
+    public UUID getUserId() {
         return this.userId;
     }
 
     /**
      * Getter for <code>public.user_roles.role_id</code>.
      */
-    public Long getRoleId() {
+    public UUID getRoleId() {
         return this.roleId;
     }
 

@@ -3,11 +3,12 @@ package com.example.demo.user.entity;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public record User(
-    Long id,
+    UUID id,
     String username,
     PasswordHash passwordHash,
     String email,

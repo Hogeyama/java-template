@@ -10,6 +10,7 @@ import com.example.demo.jooq.tables.records.RevokedTokensRecord;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 @Repository
-public class RevokedTokensDao extends DAOImpl<RevokedTokensRecord, com.example.demo.jooq.tables.pojos.RevokedTokens, Long> {
+public class RevokedTokensDao extends DAOImpl<RevokedTokensRecord, com.example.demo.jooq.tables.pojos.RevokedTokens, UUID> {
 
     /**
      * Create a new RevokedTokensDao without any configuration
@@ -40,7 +41,7 @@ public class RevokedTokensDao extends DAOImpl<RevokedTokensRecord, com.example.d
     }
 
     @Override
-    public Long getId(com.example.demo.jooq.tables.pojos.RevokedTokens object) {
+    public UUID getId(com.example.demo.jooq.tables.pojos.RevokedTokens object) {
         return object.getId();
     }
 
@@ -48,28 +49,28 @@ public class RevokedTokensDao extends DAOImpl<RevokedTokensRecord, com.example.d
      * Fetch records that have <code>id BETWEEN lowerInclusive AND
      * upperInclusive</code>
      */
-    public List<com.example.demo.jooq.tables.pojos.RevokedTokens> fetchRangeOfId(Long lowerInclusive, Long upperInclusive) {
+    public List<com.example.demo.jooq.tables.pojos.RevokedTokens> fetchRangeOfId(UUID lowerInclusive, UUID upperInclusive) {
         return fetchRange(RevokedTokens.REVOKED_TOKENS.ID, lowerInclusive, upperInclusive);
     }
 
     /**
      * Fetch records that have <code>id IN (values)</code>
      */
-    public List<com.example.demo.jooq.tables.pojos.RevokedTokens> fetchById(Long... values) {
+    public List<com.example.demo.jooq.tables.pojos.RevokedTokens> fetchById(UUID... values) {
         return fetch(RevokedTokens.REVOKED_TOKENS.ID, values);
     }
 
     /**
      * Fetch a unique record that has <code>id = value</code>
      */
-    public com.example.demo.jooq.tables.pojos.RevokedTokens fetchOneById(Long value) {
+    public com.example.demo.jooq.tables.pojos.RevokedTokens fetchOneById(UUID value) {
         return fetchOne(RevokedTokens.REVOKED_TOKENS.ID, value);
     }
 
     /**
      * Fetch a unique record that has <code>id = value</code>
      */
-    public Optional<com.example.demo.jooq.tables.pojos.RevokedTokens> fetchOptionalById(Long value) {
+    public Optional<com.example.demo.jooq.tables.pojos.RevokedTokens> fetchOptionalById(UUID value) {
         return fetchOptional(RevokedTokens.REVOKED_TOKENS.ID, value);
     }
 
@@ -136,14 +137,14 @@ public class RevokedTokensDao extends DAOImpl<RevokedTokensRecord, com.example.d
      * Fetch records that have <code>created_by_user_id BETWEEN lowerInclusive
      * AND upperInclusive</code>
      */
-    public List<com.example.demo.jooq.tables.pojos.RevokedTokens> fetchRangeOfCreatedByUserId(Long lowerInclusive, Long upperInclusive) {
+    public List<com.example.demo.jooq.tables.pojos.RevokedTokens> fetchRangeOfCreatedByUserId(UUID lowerInclusive, UUID upperInclusive) {
         return fetchRange(RevokedTokens.REVOKED_TOKENS.CREATED_BY_USER_ID, lowerInclusive, upperInclusive);
     }
 
     /**
      * Fetch records that have <code>created_by_user_id IN (values)</code>
      */
-    public List<com.example.demo.jooq.tables.pojos.RevokedTokens> fetchByCreatedByUserId(Long... values) {
+    public List<com.example.demo.jooq.tables.pojos.RevokedTokens> fetchByCreatedByUserId(UUID... values) {
         return fetch(RevokedTokens.REVOKED_TOKENS.CREATED_BY_USER_ID, values);
     }
 }

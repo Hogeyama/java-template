@@ -13,7 +13,6 @@ import com.example.demo.jooq.tables.records.RolesRecord;
 import com.example.demo.jooq.tables.records.UserRolesRecord;
 import com.example.demo.jooq.tables.records.UsersRecord;
 
-import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -39,12 +38,4 @@ public class Keys {
     public static final UniqueKey<UsersRecord> USERS_EMAIL_KEY = Internal.createUniqueKey(Users.USERS, DSL.name("users_email_key"), new TableField[] { Users.USERS.EMAIL }, true);
     public static final UniqueKey<UsersRecord> USERS_PKEY = Internal.createUniqueKey(Users.USERS, DSL.name("users_pkey"), new TableField[] { Users.USERS.ID }, true);
     public static final UniqueKey<UsersRecord> USERS_USERNAME_KEY = Internal.createUniqueKey(Users.USERS, DSL.name("users_username_key"), new TableField[] { Users.USERS.USERNAME }, true);
-
-    // -------------------------------------------------------------------------
-    // FOREIGN KEY definitions
-    // -------------------------------------------------------------------------
-
-    public static final ForeignKey<RevokedTokensRecord, UsersRecord> REVOKED_TOKENS__REVOKED_TOKENS_CREATED_BY_USER_ID_FKEY = Internal.createForeignKey(RevokedTokens.REVOKED_TOKENS, DSL.name("revoked_tokens_created_by_user_id_fkey"), new TableField[] { RevokedTokens.REVOKED_TOKENS.CREATED_BY_USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.ID }, true);
-    public static final ForeignKey<UserRolesRecord, RolesRecord> USER_ROLES__USER_ROLES_ROLE_ID_FKEY = Internal.createForeignKey(UserRoles.USER_ROLES, DSL.name("user_roles_role_id_fkey"), new TableField[] { UserRoles.USER_ROLES.ROLE_ID }, Keys.ROLES_PKEY, new TableField[] { Roles.ROLES.ID }, true);
-    public static final ForeignKey<UserRolesRecord, UsersRecord> USER_ROLES__USER_ROLES_USER_ID_FKEY = Internal.createForeignKey(UserRoles.USER_ROLES, DSL.name("user_roles_user_id_fkey"), new TableField[] { UserRoles.USER_ROLES.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.ID }, true);
 }

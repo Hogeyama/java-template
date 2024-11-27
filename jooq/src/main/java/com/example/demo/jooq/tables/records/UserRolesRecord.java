@@ -7,6 +7,7 @@ package com.example.demo.jooq.tables.records;
 import com.example.demo.jooq.tables.UserRoles;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.jooq.Record2;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -23,7 +24,7 @@ public class UserRolesRecord extends UpdatableRecordImpl<UserRolesRecord> {
     /**
      * Setter for <code>public.user_roles.user_id</code>.
      */
-    public UserRolesRecord setUserId(Long value) {
+    public UserRolesRecord setUserId(UUID value) {
         set(0, value);
         return this;
     }
@@ -31,14 +32,14 @@ public class UserRolesRecord extends UpdatableRecordImpl<UserRolesRecord> {
     /**
      * Getter for <code>public.user_roles.user_id</code>.
      */
-    public Long getUserId() {
-        return (Long) get(0);
+    public UUID getUserId() {
+        return (UUID) get(0);
     }
 
     /**
      * Setter for <code>public.user_roles.role_id</code>.
      */
-    public UserRolesRecord setRoleId(Long value) {
+    public UserRolesRecord setRoleId(UUID value) {
         set(1, value);
         return this;
     }
@@ -46,8 +47,8 @@ public class UserRolesRecord extends UpdatableRecordImpl<UserRolesRecord> {
     /**
      * Getter for <code>public.user_roles.role_id</code>.
      */
-    public Long getRoleId() {
-        return (Long) get(1);
+    public UUID getRoleId() {
+        return (UUID) get(1);
     }
 
     /**
@@ -70,7 +71,7 @@ public class UserRolesRecord extends UpdatableRecordImpl<UserRolesRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record2<Long, Long> key() {
+    public Record2<UUID, UUID> key() {
         return (Record2) super.key();
     }
 
@@ -88,7 +89,7 @@ public class UserRolesRecord extends UpdatableRecordImpl<UserRolesRecord> {
     /**
      * Create a detached, initialised UserRolesRecord
      */
-    public UserRolesRecord(Long userId, Long roleId, OffsetDateTime createdAt) {
+    public UserRolesRecord(UUID userId, UUID roleId, OffsetDateTime createdAt) {
         super(UserRoles.USER_ROLES);
 
         setUserId(userId);

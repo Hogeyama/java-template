@@ -6,24 +6,17 @@ package com.example.demo.jooq.tables;
 
 import com.example.demo.jooq.Keys;
 import com.example.demo.jooq.Public;
-import com.example.demo.jooq.tables.Roles.RolesPath;
-import com.example.demo.jooq.tables.Users.UsersPath;
 import com.example.demo.jooq.tables.records.UserRolesRecord;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -61,12 +54,12 @@ public class UserRoles extends TableImpl<UserRolesRecord> {
     /**
      * The column <code>public.user_roles.user_id</code>.
      */
-    public final TableField<UserRolesRecord, Long> USER_ID = createField(DSL.name("user_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<UserRolesRecord, UUID> USER_ID = createField(DSL.name("user_id"), SQLDataType.UUID.nullable(false), this, "");
 
     /**
      * The column <code>public.user_roles.role_id</code>.
      */
-    public final TableField<UserRolesRecord, Long> ROLE_ID = createField(DSL.name("role_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<UserRolesRecord, UUID> ROLE_ID = createField(DSL.name("role_id"), SQLDataType.UUID.nullable(false), this, "");
 
     /**
      * The column <code>public.user_roles.created_at</code>.
@@ -102,37 +95,6 @@ public class UserRoles extends TableImpl<UserRolesRecord> {
         this(DSL.name("user_roles"), null);
     }
 
-    public <O extends Record> UserRoles(Table<O> path, ForeignKey<O, UserRolesRecord> childPath, InverseForeignKey<O, UserRolesRecord> parentPath) {
-        super(path, childPath, parentPath, USER_ROLES);
-    }
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    public static class UserRolesPath extends UserRoles implements Path<UserRolesRecord> {
-        public <O extends Record> UserRolesPath(Table<O> path, ForeignKey<O, UserRolesRecord> childPath, InverseForeignKey<O, UserRolesRecord> parentPath) {
-            super(path, childPath, parentPath);
-        }
-        private UserRolesPath(Name alias, Table<UserRolesRecord> aliased) {
-            super(alias, aliased);
-        }
-
-        @Override
-        public UserRolesPath as(String alias) {
-            return new UserRolesPath(DSL.name(alias), this);
-        }
-
-        @Override
-        public UserRolesPath as(Name alias) {
-            return new UserRolesPath(alias, this);
-        }
-
-        @Override
-        public UserRolesPath as(Table<?> alias) {
-            return new UserRolesPath(alias.getQualifiedName(), this);
-        }
-    }
-
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
@@ -141,35 +103,6 @@ public class UserRoles extends TableImpl<UserRolesRecord> {
     @Override
     public UniqueKey<UserRolesRecord> getPrimaryKey() {
         return Keys.USER_ROLES_PKEY;
-    }
-
-    @Override
-    public List<ForeignKey<UserRolesRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.USER_ROLES__USER_ROLES_USER_ID_FKEY, Keys.USER_ROLES__USER_ROLES_ROLE_ID_FKEY);
-    }
-
-    private transient UsersPath _users;
-
-    /**
-     * Get the implicit join path to the <code>public.users</code> table.
-     */
-    public UsersPath users() {
-        if (_users == null)
-            _users = new UsersPath(this, Keys.USER_ROLES__USER_ROLES_USER_ID_FKEY, null);
-
-        return _users;
-    }
-
-    private transient RolesPath _roles;
-
-    /**
-     * Get the implicit join path to the <code>public.roles</code> table.
-     */
-    public RolesPath roles() {
-        if (_roles == null)
-            _roles = new RolesPath(this, Keys.USER_ROLES__USER_ROLES_ROLE_ID_FKEY, null);
-
-        return _roles;
     }
 
     @Override

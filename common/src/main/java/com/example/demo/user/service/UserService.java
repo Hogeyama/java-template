@@ -4,11 +4,12 @@ import com.example.demo.user.entity.Role;
 import com.example.demo.user.entity.User;
 import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.repository.UserRepository.InsertResult;
+import com.fasterxml.uuid.Generators;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -47,9 +48,11 @@ public class UserService {
 
     var hash = mHash.get();
     var now = OffsetDateTime.now(ZoneId.of("Asia/Tokyo"));
-    var roles = Set.of(new Role(1L, "READ", now)); // TODO リポジトリから取る
 
-    var userId = new Random().nextLong(); // TODO UUIDかなにかを生成する
+    var roleId = generateUUID();
+    var roles = Set.of(new Role(roleId, "READ", now)); // TODO リポジトリから取る
+
+    var userId = generateUUID();
     var user = new User(userId, username, hash, "tekito@example.com", true, now, now, roles);
 
     switch (userRepository.insert(user)) {
@@ -60,6 +63,10 @@ public class UserService {
         log.info("User already exists: {}", user.username());
         return new CreateUserResult.AlreadyExists();
     }
+  }
+
+  private UUID generateUUID() {
+    return Generators.timeBasedEpochRandomGenerator().generate();
   }
 
   // ----------------------------------------------------------------------------------------------

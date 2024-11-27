@@ -9,6 +9,7 @@ import com.example.demo.jooq.tables.records.UserRolesRecord;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Configuration;
 import org.jooq.Record2;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 @Repository
-public class UserRolesDao extends DAOImpl<UserRolesRecord, com.example.demo.jooq.tables.pojos.UserRoles, Record2<Long, Long>> {
+public class UserRolesDao extends DAOImpl<UserRolesRecord, com.example.demo.jooq.tables.pojos.UserRoles, Record2<UUID, UUID>> {
 
     /**
      * Create a new UserRolesDao without any configuration
@@ -40,7 +41,7 @@ public class UserRolesDao extends DAOImpl<UserRolesRecord, com.example.demo.jooq
     }
 
     @Override
-    public Record2<Long, Long> getId(com.example.demo.jooq.tables.pojos.UserRoles object) {
+    public Record2<UUID, UUID> getId(com.example.demo.jooq.tables.pojos.UserRoles object) {
         return compositeKeyRecord(object.getUserId(), object.getRoleId());
     }
 
@@ -48,14 +49,14 @@ public class UserRolesDao extends DAOImpl<UserRolesRecord, com.example.demo.jooq
      * Fetch records that have <code>user_id BETWEEN lowerInclusive AND
      * upperInclusive</code>
      */
-    public List<com.example.demo.jooq.tables.pojos.UserRoles> fetchRangeOfUserId(Long lowerInclusive, Long upperInclusive) {
+    public List<com.example.demo.jooq.tables.pojos.UserRoles> fetchRangeOfUserId(UUID lowerInclusive, UUID upperInclusive) {
         return fetchRange(UserRoles.USER_ROLES.USER_ID, lowerInclusive, upperInclusive);
     }
 
     /**
      * Fetch records that have <code>user_id IN (values)</code>
      */
-    public List<com.example.demo.jooq.tables.pojos.UserRoles> fetchByUserId(Long... values) {
+    public List<com.example.demo.jooq.tables.pojos.UserRoles> fetchByUserId(UUID... values) {
         return fetch(UserRoles.USER_ROLES.USER_ID, values);
     }
 
@@ -63,14 +64,14 @@ public class UserRolesDao extends DAOImpl<UserRolesRecord, com.example.demo.jooq
      * Fetch records that have <code>role_id BETWEEN lowerInclusive AND
      * upperInclusive</code>
      */
-    public List<com.example.demo.jooq.tables.pojos.UserRoles> fetchRangeOfRoleId(Long lowerInclusive, Long upperInclusive) {
+    public List<com.example.demo.jooq.tables.pojos.UserRoles> fetchRangeOfRoleId(UUID lowerInclusive, UUID upperInclusive) {
         return fetchRange(UserRoles.USER_ROLES.ROLE_ID, lowerInclusive, upperInclusive);
     }
 
     /**
      * Fetch records that have <code>role_id IN (values)</code>
      */
-    public List<com.example.demo.jooq.tables.pojos.UserRoles> fetchByRoleId(Long... values) {
+    public List<com.example.demo.jooq.tables.pojos.UserRoles> fetchByRoleId(UUID... values) {
         return fetch(UserRoles.USER_ROLES.ROLE_ID, values);
     }
 

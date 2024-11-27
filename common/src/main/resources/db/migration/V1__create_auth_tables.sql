@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -9,28 +9,29 @@ CREATE TABLE users (
 );
 
 CREATE TABLE roles (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE user_roles (
-    user_id BIGINT NOT NULL REFERENCES users(id),
-    role_id BIGINT NOT NULL REFERENCES roles(id),
+    user_id UUID NOT NULL,
+    role_id UUID NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, role_id)
 );
 
 CREATE TABLE revoked_tokens (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     jti VARCHAR(255) NOT NULL UNIQUE,
     revoked_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     reason VARCHAR(255),
-    created_by_user_id BIGINT REFERENCES users(id),
+    created_by_user_id UUID,
     CONSTRAINT revoked_tokens_jti_idx UNIQUE (jti)
 );
 
 -- デフォルトのロールを作成
-INSERT INTO roles (name) VALUES
-    ('ROLE_USER'),
-    ('ROLE_ADMIN');
+INSERT INTO roles (id, name) VALUES
+    (gen_random_uuid(), 'ROLE_USER'),
+    (gen_random_uuid(), 'ROLE_ADMIN');
+

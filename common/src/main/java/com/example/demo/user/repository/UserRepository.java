@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,7 +85,7 @@ public class UserRepository {
     }
   }
 
-  public void changePassword(Long id, User.PasswordHash passwordHash) {}
+  public void changePassword(UUID id, User.PasswordHash passwordHash) {}
 
   // --------------------------------------------------------------------------------------------
   // Helper

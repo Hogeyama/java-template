@@ -7,6 +7,7 @@ package com.example.demo.jooq.tables.records;
 import com.example.demo.jooq.tables.Users;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -23,7 +24,7 @@ public class UsersRecord extends UpdatableRecordImpl<UsersRecord> {
     /**
      * Setter for <code>public.users.id</code>.
      */
-    public UsersRecord setId(Long value) {
+    public UsersRecord setId(UUID value) {
         set(0, value);
         return this;
     }
@@ -31,8 +32,8 @@ public class UsersRecord extends UpdatableRecordImpl<UsersRecord> {
     /**
      * Getter for <code>public.users.id</code>.
      */
-    public Long getId() {
-        return (Long) get(0);
+    public UUID getId() {
+        return (UUID) get(0);
     }
 
     /**
@@ -130,7 +131,7 @@ public class UsersRecord extends UpdatableRecordImpl<UsersRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<Long> key() {
+    public Record1<UUID> key() {
         return (Record1) super.key();
     }
 
@@ -148,7 +149,7 @@ public class UsersRecord extends UpdatableRecordImpl<UsersRecord> {
     /**
      * Create a detached, initialised UsersRecord
      */
-    public UsersRecord(Long id, String username, String password, String email, Boolean enabled, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public UsersRecord(UUID id, String username, String password, String email, Boolean enabled, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         super(Users.USERS);
 
         setId(id);

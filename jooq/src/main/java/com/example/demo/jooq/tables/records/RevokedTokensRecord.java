@@ -7,6 +7,7 @@ package com.example.demo.jooq.tables.records;
 import com.example.demo.jooq.tables.RevokedTokens;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -23,7 +24,7 @@ public class RevokedTokensRecord extends UpdatableRecordImpl<RevokedTokensRecord
     /**
      * Setter for <code>public.revoked_tokens.id</code>.
      */
-    public RevokedTokensRecord setId(Long value) {
+    public RevokedTokensRecord setId(UUID value) {
         set(0, value);
         return this;
     }
@@ -31,8 +32,8 @@ public class RevokedTokensRecord extends UpdatableRecordImpl<RevokedTokensRecord
     /**
      * Getter for <code>public.revoked_tokens.id</code>.
      */
-    public Long getId() {
-        return (Long) get(0);
+    public UUID getId() {
+        return (UUID) get(0);
     }
 
     /**
@@ -83,7 +84,7 @@ public class RevokedTokensRecord extends UpdatableRecordImpl<RevokedTokensRecord
     /**
      * Setter for <code>public.revoked_tokens.created_by_user_id</code>.
      */
-    public RevokedTokensRecord setCreatedByUserId(Long value) {
+    public RevokedTokensRecord setCreatedByUserId(UUID value) {
         set(4, value);
         return this;
     }
@@ -91,8 +92,8 @@ public class RevokedTokensRecord extends UpdatableRecordImpl<RevokedTokensRecord
     /**
      * Getter for <code>public.revoked_tokens.created_by_user_id</code>.
      */
-    public Long getCreatedByUserId() {
-        return (Long) get(4);
+    public UUID getCreatedByUserId() {
+        return (UUID) get(4);
     }
 
     // -------------------------------------------------------------------------
@@ -100,7 +101,7 @@ public class RevokedTokensRecord extends UpdatableRecordImpl<RevokedTokensRecord
     // -------------------------------------------------------------------------
 
     @Override
-    public Record1<Long> key() {
+    public Record1<UUID> key() {
         return (Record1) super.key();
     }
 
@@ -118,7 +119,7 @@ public class RevokedTokensRecord extends UpdatableRecordImpl<RevokedTokensRecord
     /**
      * Create a detached, initialised RevokedTokensRecord
      */
-    public RevokedTokensRecord(Long id, String jti, OffsetDateTime revokedAt, String reason, Long createdByUserId) {
+    public RevokedTokensRecord(UUID id, String jti, OffsetDateTime revokedAt, String reason, UUID createdByUserId) {
         super(RevokedTokens.REVOKED_TOKENS);
 
         setId(id);

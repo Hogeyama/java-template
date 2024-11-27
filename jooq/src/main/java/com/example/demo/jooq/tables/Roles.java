@@ -6,25 +6,19 @@ package com.example.demo.jooq.tables;
 
 import com.example.demo.jooq.Keys;
 import com.example.demo.jooq.Public;
-import com.example.demo.jooq.tables.UserRoles.UserRolesPath;
-import com.example.demo.jooq.tables.Users.UsersPath;
 import com.example.demo.jooq.tables.records.RolesRecord;
 
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Identity;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -62,7 +56,7 @@ public class Roles extends TableImpl<RolesRecord> {
     /**
      * The column <code>public.roles.id</code>.
      */
-    public final TableField<RolesRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<RolesRecord, UUID> ID = createField(DSL.name("id"), SQLDataType.UUID.nullable(false), this, "");
 
     /**
      * The column <code>public.roles.name</code>.
@@ -103,45 +97,9 @@ public class Roles extends TableImpl<RolesRecord> {
         this(DSL.name("roles"), null);
     }
 
-    public <O extends Record> Roles(Table<O> path, ForeignKey<O, RolesRecord> childPath, InverseForeignKey<O, RolesRecord> parentPath) {
-        super(path, childPath, parentPath, ROLES);
-    }
-
-    /**
-     * A subtype implementing {@link Path} for simplified path-based joins.
-     */
-    public static class RolesPath extends Roles implements Path<RolesRecord> {
-        public <O extends Record> RolesPath(Table<O> path, ForeignKey<O, RolesRecord> childPath, InverseForeignKey<O, RolesRecord> parentPath) {
-            super(path, childPath, parentPath);
-        }
-        private RolesPath(Name alias, Table<RolesRecord> aliased) {
-            super(alias, aliased);
-        }
-
-        @Override
-        public RolesPath as(String alias) {
-            return new RolesPath(DSL.name(alias), this);
-        }
-
-        @Override
-        public RolesPath as(Name alias) {
-            return new RolesPath(alias, this);
-        }
-
-        @Override
-        public RolesPath as(Table<?> alias) {
-            return new RolesPath(alias.getQualifiedName(), this);
-        }
-    }
-
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
-    }
-
-    @Override
-    public Identity<RolesRecord, Long> getIdentity() {
-        return (Identity<RolesRecord, Long>) super.getIdentity();
     }
 
     @Override
@@ -152,27 +110,6 @@ public class Roles extends TableImpl<RolesRecord> {
     @Override
     public List<UniqueKey<RolesRecord>> getUniqueKeys() {
         return Arrays.asList(Keys.ROLES_NAME_KEY);
-    }
-
-    private transient UserRolesPath _userRoles;
-
-    /**
-     * Get the implicit to-many join path to the <code>public.user_roles</code>
-     * table
-     */
-    public UserRolesPath userRoles() {
-        if (_userRoles == null)
-            _userRoles = new UserRolesPath(this, null, Keys.USER_ROLES__USER_ROLES_ROLE_ID_FKEY.getInverseKey());
-
-        return _userRoles;
-    }
-
-    /**
-     * Get the implicit many-to-many join path to the <code>public.users</code>
-     * table
-     */
-    public UsersPath users() {
-        return userRoles().users();
     }
 
     @Override
