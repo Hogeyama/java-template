@@ -1,9 +1,10 @@
 plugins {
     id "net.ltgt.errorprone" version "4.1.0" apply false
     id 'org.springframework.boot' version '3.4.0' apply false
-    id 'com.diffplug.spotless' version '6.25.0' apply false
-    id 'nu.studer.jooq' version "9.0"
+    id 'com.diffplug.spotless' version '6.25.0'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'nu.studer.jooq' version "9.0"
+    id 'org.flywaydb.flyway' version "11.0.0"
 }
 
 import net.ltgt.gradle.errorprone.CheckSeverity
@@ -13,6 +14,17 @@ allprojects {
 
     repositories {
         mavenCentral()
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
+    dependencyLocking {
+        lockFile.set(file("${projectDir}/gradle.lockfile"))
+        lockAllConfigurations()
     }
 }
 
@@ -35,12 +47,6 @@ subprojects {
     configurations {
         compileOnly {
             extendsFrom annotationProcessor
-        }
-    }
-
-    dependencyManagement {
-        imports {
-            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
         }
     }
 
@@ -104,11 +110,34 @@ subprojects {
         }
     }
 
-    dependencyLocking {
-        lockFile.set(file("${projectDir}/gradle.lockfile"))
-        lockAllConfigurations()
-    }
 }
+
+// ----------------------------------------------------------------------------
+// Root project
+
+dependencies {
+    jooqGenerator 'org.postgresql:postgresql'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+    runtimeOnly 'org.postgresql:postgresql'
+}
+
+// compose.yamlと合わせること
+def devPostgresUrl = 'jdbc:postgresql://localhost:5432/postgres'
+def devPostgresUser = 'postgres'
+def devPostgresPassword = ''
+
+// Flyway
+
+flyway {
+    url = devPostgresUrl
+    user = devPostgresUser
+    password = devPostgresPassword
+    cleanDisabled = false
+    locations = ['classpath:db/migration']
+}
+
+// jOOQ
 
 jooq {
     // Springと同じバージョンを使う
@@ -121,10 +150,9 @@ jooq {
             generationTool {
                 jdbc {
                     driver = 'org.postgresql.Driver'
-                    // compose.yamlと合わせる
-                    url = 'jdbc:postgresql://localhost:5432/postgres'
-                    user = 'postgres'
-                    password = ''
+                    url = devPostgresUrl
+                    user = devPostgresUser
+                    password = devPostgresPassword
                 }
                 generator {
                     name = 'org.jooq.codegen.DefaultGenerator'
@@ -150,10 +178,6 @@ jooq {
             }
         }
     }
-}
-
-dependencies {
-    jooqGenerator 'org.postgresql:postgresql:42.5.4'
 }
 
 tasks.named('generateJooq').configure {

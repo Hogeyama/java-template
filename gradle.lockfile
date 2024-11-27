@@ -1,5 +1,22 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
+com.fasterxml.jackson.core:jackson-annotations:2.18.1=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-core:2.18.1=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-databind:2.18.1=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.18.1=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.1=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson:jackson-bom:2.18.1=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.google.errorprone:javac:9+181-r4173-1=errorproneJavac
-empty=annotationProcessor,compileClasspath,runtimeClasspath,testAnnotationProcessor,testCompileClasspath,testRuntimeClasspath
+io.r2dbc:r2dbc-spi:1.0.0.RELEASE=compileClasspath,jooqGenerator,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+jakarta.activation:jakarta.activation-api:2.1.3=jooqGenerator
+jakarta.xml.bind:jakarta.xml.bind-api:4.0.2=jooqGenerator
+org.checkerframework:checker-qual:3.42.0=jooqGenerator,runtimeClasspath,testRuntimeClasspath
+org.flywaydb:flyway-core:10.20.1=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.flywaydb:flyway-database-postgresql:10.20.1=compileClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.jooq:jooq-codegen:3.19.15=jooqGenerator
+org.jooq:jooq-meta:3.19.15=jooqGenerator
+org.jooq:jooq:3.19.15=compileClasspath,jooqGenerator,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.postgresql:postgresql:42.7.4=jooqGenerator,runtimeClasspath,testRuntimeClasspath
+org.reactivestreams:reactive-streams:1.0.4=compileClasspath,jooqGenerator,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+empty=annotationProcessor,testAnnotationProcessor
