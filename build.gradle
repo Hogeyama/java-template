@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        // buildscriptはpluginsの前に書く必要があるため、バージョンを直打ちしている。
+        // io.spring.dependency-managementを更新するときはここも更新する必要がある。
+        classpath 'org.flywaydb:flyway-database-postgresql:10.20.1'
+    }
+}
+
 plugins {
     id "net.ltgt.errorprone" version "4.1.0" apply false
     id 'org.springframework.boot' version '3.4.0' apply false
@@ -115,28 +126,35 @@ subprojects {
 // ----------------------------------------------------------------------------
 // Root project
 
+configurations {
+    flywayMigration
+}
+
 dependencies {
     jooqGenerator 'org.postgresql:postgresql'
-    implementation 'org.flywaydb:flyway-core'
-    implementation 'org.flywaydb:flyway-database-postgresql'
-    runtimeOnly 'org.postgresql:postgresql'
+    flywayMigration 'org.flywaydb:flyway-core'
+    flywayMigration 'org.flywaydb:flyway-database-postgresql'
+    flywayMigration 'org.postgresql:postgresql'
 }
+
+// ------
+// Flyway
 
 // compose.yamlと合わせること
 def devPostgresUrl = 'jdbc:postgresql://localhost:5432/postgres'
 def devPostgresUser = 'postgres'
 def devPostgresPassword = ''
 
-// Flyway
-
 flyway {
     url = devPostgresUrl
     user = devPostgresUser
     password = devPostgresPassword
     cleanDisabled = false
-    locations = ['classpath:db/migration']
+    locations = ['filesystem:common/src/main/resources/db/migration']
+    configurations = [ 'flywayMigration' ]
 }
 
+// -----
 // jOOQ
 
 jooq {
