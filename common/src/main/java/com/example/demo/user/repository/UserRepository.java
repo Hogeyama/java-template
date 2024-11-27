@@ -30,6 +30,9 @@ public class UserRepository {
 
   private final DSLContext dsl;
 
+  // --------------------------------------------------------------------------------------------
+  // Queries
+
   public Optional<User> findByUsername(String username) {
     var query =
         dsl.select(
@@ -55,6 +58,9 @@ public class UserRepository {
       return Optional.empty();
     }
   }
+
+  // --------------------------------------------------------------------------------------------
+  // Commands
 
   public sealed interface InsertResult permits InsertResult.Success, InsertResult.AlreadyExists {
     public record Success() implements InsertResult {}
@@ -85,7 +91,23 @@ public class UserRepository {
     }
   }
 
-  public void changePassword(UUID id, User.PasswordHash passwordHash) {}
+  public sealed interface ChangePasswordResult
+      permits ChangePasswordResult.Success, ChangePasswordResult.UserNotFound {
+    public record Success() implements ChangePasswordResult {}
+
+    public record UserNotFound() implements ChangePasswordResult {}
+  }
+
+  public ChangePasswordResult changePassword(UUID id, User.PasswordHash passwordHash) {
+    var query =
+        dsl.update(USERS).set(USERS.PASSWORD, passwordHash.asString()).where(USERS.ID.eq(id));
+    var res = query.execute();
+    if (res == 0) {
+      return new ChangePasswordResult.UserNotFound();
+    } else {
+      return new ChangePasswordResult.Success();
+    }
+  }
 
   // --------------------------------------------------------------------------------------------
   // Helper
